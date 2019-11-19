@@ -53,5 +53,18 @@ export const MoveText=styled.p`
     position: absolute;
     color:#00ff8e;
     left:51%;
-    top:43%
+    top:43%;
+`
+
+const OptionButton=styled.button`
+    position:absolute;
+    top:5%;
+`
+
+export const FlightToggle=styled(OptionButton)`
+    
+`
+
+export const DashButton=styled(OptionButton)`
+
 `
