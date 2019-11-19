@@ -1,13 +1,23 @@
-import React,{useContext} from 'react';
-import Global from './Context/ContextProvider'
+import React,{useContext,useEffect} from 'react';
+import {GlobalContext} from './Context/provider'
+import Game from './Components/Game';
+import './global.css'
 
 function App() {
-    const global = useContext(Global)
+    const {dispatch,init,login,Connection,map,...player} = useContext(GlobalContext)
+    useEffect(()=>{
+        if (!player.connected) {
+            login()
+        }else{
+            init()
+        }
+    }
+    ,[player.connected])
+
+    
 
     return (
-        <section>
-            
-        </section>
+        <Game/>
     );
 }
 

@@ -1,9 +1,9 @@
 class Room{
-    constructor(id,title,description,coords,exits){
+    constructor(id,title,description,exits){
         this.id=id
         this.title=title
         this.description=description
-        this.coords=coords
+        this.exits={}
         exits.forEach(e=>this.addExit(e))
     }
 
@@ -23,3 +23,5 @@ class Room{
         return this.exits[which] || this.exits[which]!='?'
     }
 }
+
+export default Room

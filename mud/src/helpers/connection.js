@@ -18,20 +18,26 @@ class Connector{
     }
 
     transmog=async item=>{
-        let data = await this.connection.post('/api/adv/transmogrify/',{name:item})
+        let data = await this.connection.post('/adv/transmogrify/',{name:item})
         let ret = await data.data
         return ret
     }
 
     attemptMine=async proof=>{
-        let data = await this.connection.post('/api/bc/mine/',{proof})
+        let data = await this.connection.post('/bc/mine/',{proof})
         let ret = await data.data
+        console.log(ret)
     }
     
     init=async e=>{
-        let data = await this.connection.get('/adv/init/')
-        let ret = await data.data
-        console.log(ret)
+        try {
+            let data = await this.connection.get('/adv/init/')
+            let ret = await data.data
+            return ret
+        } catch (error) {
+            console.log(error.response.data)
+            console.error({...error})
+        }
     }
 
     serll = async e=>{

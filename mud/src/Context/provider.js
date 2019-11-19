@@ -2,6 +2,7 @@ import React from 'react'
 import {Connection} from '../helpers/connection'
 
 const defaultValues={
+    name:'unnamed',
     cooldown:0,
     strength:0,
     speed:0,
@@ -11,7 +12,12 @@ const defaultValues={
     footwear:'None',
     status:[],
     map:{},
-    Connection
+    connected:false,
+    Connection,
+    init:()=>{},
+    login:()=>{},
+    dispatch:()=>{},
+    map:{}
 }
 
 const GlobalContext=React.createContext(defaultValues)
