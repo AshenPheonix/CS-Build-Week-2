@@ -40,10 +40,28 @@ class Connector{
         }
     }
 
-    serll = async e=>{
+    sell = async e=>{
         let data = await this.connection.post('/adv/sell/',{'name':e})
         let ret = await data.data
         return ret
+    }
+
+    explore = async e=>{
+        let data = await this.connection.post('/adv/move',{'direction':e})
+        let ret = data.data
+        return ret
+    }
+
+    walk = async (direction,attached)=>{
+        console.log(`walking with ${direction} and ${attached}`);
+        try {
+            let data = await this.connection.post('/adv/move',{direction,next_room_id:attached.toString()})
+            let ret = data.data
+            console.log(ret);
+            return ret
+        } catch (error) {
+            console.log({...error});
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 import React from 'react'
 import {Connection} from '../helpers/connection'
+import Room from '../objects/room'
 
 const defaultValues={
     name:'unnamed',
@@ -17,7 +18,8 @@ const defaultValues={
     init:()=>{},
     login:()=>{},
     dispatch:()=>{},
-    map:{}
+    map:{},
+    currentRoom:null
 }
 
 const GlobalContext=React.createContext(defaultValues)

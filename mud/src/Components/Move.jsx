@@ -5,8 +5,21 @@ import Gamepad from 'react-gamepad'
 
 
 function MoveBar() {
-    const [moveType,setMoveType]=useState('move')
-    const {cooldown,map}=useContext(GlobalContext)
+
+    const   MOVE='MOVE',
+            FLY="FLY",
+            DASH="DASH",
+            DIR_MAP={
+                'up':'n',
+                'right':'e',
+                'down':'s',
+                'left':'w'
+            }
+
+    const [moveType,setMoveType]=useState(MOVE)
+    const [acceptable,setAcceptable]=useState(null)
+    const [blink,setBlink]=useState(true)
+    const {cooldown,map,move}=useContext(GlobalContext)
 
     const connect=index=>{
         console.log(`gamepad ${index} connnected`);
@@ -16,10 +29,43 @@ function MoveBar() {
         console.log(`gamepad ${index} disconnected`);
     }
 
-    const directional=(direction)=>{
-        console.log('directional ',direction);
+    const accept=e=>{
+        if(acceptable){
+            acceptable(true)
+            setAcceptable(null)
+        }
     }
 
+    const deny=e=>{
+        if(acceptable){
+            acceptable(false)
+        }
+    }
+
+    const moveChange=e=>{
+        if(moveType===MOVE){
+            setMoveType(DASH)
+        }else{
+            setMoveType(MOVE)
+        }
+    }
+
+    const directional=(direction)=>{
+        if(cooldown<1 && !blink){
+            // setBlink(true)
+            move(DIR_MAP[direction])
+        }
+    }
+
+    const openMenu=e=>{
+        console.log(map)
+    }
+
+    useEffect(()=>{
+        if (cooldown<1) {
+            setBlink(false)
+        }
+    },[blink])
 
     return (
             <Gamepad
@@ -37,7 +83,7 @@ function MoveBar() {
                     <RightButton onClick={()=>directional('right')}/>
                     <LeftButton onClick={()=>directional('left')}/>
                     <MoveText>
-                        {cooldown}
+                        {cooldown>0 && cooldown}
                     </MoveText>
                 </MoveBoard>
             </Gamepad>
