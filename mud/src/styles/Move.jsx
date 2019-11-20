@@ -58,7 +58,9 @@ export const MoveText=styled.p`
 
 const OptionButton=styled.button`
     position:absolute;
-    top:5%;
+    background:black;
+    color:#00a45b;
+    border: groove 2px #00a45b;
 `
 
 export const FlightToggle=styled(OptionButton)`
@@ -67,4 +69,18 @@ export const FlightToggle=styled(OptionButton)`
 
 export const DashButton=styled(OptionButton)`
 
+`
+
+export const PrayButton=styled(OptionButton)`
+    right: 15%;
+    top: 48%;
+`
+
+export const ShopButton=styled.button`
+    position:absolute;
+    bottom:5%;
+    height:1.5rem;
+    background:black;
+    color:#00a45b;
+    border: groove 2px #00a45b;
 `

@@ -8,7 +8,7 @@ const defaultValues={
     strength:0,
     speed:0,
     gold:0,
-    items:[],
+    inventory:[],
     bodywear:'None',
     footwear:'None',
     status:[],
@@ -19,7 +19,12 @@ const defaultValues={
     login:()=>{},
     dispatch:()=>{},
     map:{},
-    currentRoom:null
+    currentRoom:null,
+    pickup:(item)=>{},
+    resetUser:()=>{},
+    changeName:()=>{},
+    pray:()=>{},
+    getProof:()=>{}
 }
 
 const GlobalContext=React.createContext(defaultValues)

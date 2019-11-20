@@ -11,3 +11,9 @@ export const GameBoard=styled.div`
         padding:0;
     }
 `
+
+export const ColumnA=styled.section`
+    background-color:black;
+    display:flex;
+    flex-direction:column;s
+`

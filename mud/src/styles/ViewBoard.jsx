@@ -40,3 +40,7 @@ export const Backpack=styled(StatBlock)`
     position:absolute;
     bottom:8%;
 `
+
+export const BPButton=styled.button`
+    
+`

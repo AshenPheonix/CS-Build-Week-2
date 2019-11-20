@@ -1,11 +1,12 @@
 import React,{useContext,useState} from 'react'
 import {GlobalContext} from '../Context/provider'
-import {CharSheet,StatBlock,BodySlot,FootSlot,Backpack} from '../styles/ViewBoard'
+import {CharSheet,StatBlock,BodySlot,FootSlot,Backpack,BPButton} from '../styles/ViewBoard'
 function ViewChar() {
-    const {name,strength,speed,status,bodywear,footwear,gold,items}=useContext(GlobalContext)
+    const {name,strength,speed,status,bodywear,footwear,gold,inventory,resetUser,currentRoom}=useContext(GlobalContext)
 
     return (
         <CharSheet>
+            <BPButton onClick={resetUser}>Reset Player</BPButton>
             <StatBlock>
                 <li>Name: {name}</li>
                 <li>Strength: {strength}</li>
@@ -13,21 +14,21 @@ function ViewChar() {
                 <li>Current Gold: {gold}</li>                
                 <li>Statuses: 
                     <ul>
-                        {status.length>0?status.map(stat=><li>{stat}</li>):<li>None</li>}
+                        {status.length>0?status.map((stat,index)=><li key={index}>{stat}</li>):<li>None</li>}
                     </ul>
                 </li>
             </StatBlock>
             <BodySlot>
-                {bodywear==='None'?'Shirt':bodywear}
+                {bodywear==='None' || bodywear===null?'Shirt':bodywear}
             </BodySlot>
             <FootSlot>
-                {footwear==='None'?'Boots':footwear}
+                {footwear==='None' || footwear===null?'Boots':footwear}
             </FootSlot>
             <Backpack>
                 Backpack
-                {items.length===0?
+                {inventory.length===0?
                     <li>Empty</li>:
-                    items.map(item=><li>{item}</li>)
+                    inventory.map(item=><li>{item}</li>)
                 }
             </Backpack>
         </CharSheet>

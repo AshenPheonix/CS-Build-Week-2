@@ -1,10 +1,13 @@
 import React,{useContext,useEffect,useState} from 'react'
-import {MoveBoard,UpButton,DownButton,RightButton,LeftButton,MoveText} from '../styles/Move'
+import {MoveBoard,UpButton,DownButton,RightButton,LeftButton,MoveText,ShopButton,PrayButton} from '../styles/Move'
 import {GlobalContext} from '../Context/provider'
 import Gamepad from 'react-gamepad'
+import ShopDialog from './Dialog'
 
 
 function MoveBar() {
+
+    const [openShop,setOpenShop]=useState(false)
 
     const   MOVE='MOVE',
             FLY="FLY",
@@ -19,7 +22,7 @@ function MoveBar() {
     const [moveType,setMoveType]=useState(MOVE)
     const [acceptable,setAcceptable]=useState(null)
     const [blink,setBlink]=useState(true)
-    const {cooldown,map,move}=useContext(GlobalContext)
+    const {cooldown,map,move,currentRoom,pray,getProof}=useContext(GlobalContext)
 
     const connect=index=>{
         console.log(`gamepad ${index} connnected`);
@@ -61,6 +64,18 @@ function MoveBar() {
         console.log(map)
     }
 
+    const prayButton=e=>{
+        if(cooldown<1 && !blink){
+            pray()
+        }
+    }
+
+    const wish=e=>{
+        if (cooldown<1 && !blink) {
+            getProof()
+        }
+    }
+
     useEffect(()=>{
         if (cooldown<1) {
             setBlink(false)
@@ -85,6 +100,26 @@ function MoveBar() {
                     <MoveText>
                         {cooldown>0 && cooldown}
                     </MoveText>
+                    <ShopDialog
+                        open={openShop}
+                        closer={setOpenShop}
+                    />
+                    {
+                        currentRoom.title=="Shop" && 
+                        <ShopButton onClick={()=>setOpenShop(true)}>Open Shop</ShopButton>
+                    }
+                    {
+                        currentRoom.description.includes('shrine') &&
+                        <PrayButton onClick={prayButton}>
+                            Pray At this Shrine
+                        </PrayButton>
+                    }
+                    {
+                        currentRoom.title==='Wishing Well' &&
+                        <PrayButton onClick={wish}>
+                            Make Wish
+                        </PrayButton>
+                    }
                 </MoveBoard>
             </Gamepad>
     )

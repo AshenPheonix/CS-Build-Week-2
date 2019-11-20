@@ -53,7 +53,6 @@ class Connector{
     }
 
     walk = async (direction,attached)=>{
-        console.log(`walking with ${direction} and ${attached}`);
         try {
             let data = await this.connection.post('/adv/move',{direction,next_room_id:attached.toString()})
             let ret = data.data
@@ -61,6 +60,100 @@ class Connector{
             return ret
         } catch (error) {
             console.log({...error});
+        }
+    }
+
+    pickup = async (item)=>{
+        try {
+            let data = await this.connection.post('/adv/take/',{name:item})
+            let ret = data.data
+            return ret
+        } catch (error) {
+            console.log({...error});
+        }
+    }
+    resetUser=async()=>{
+        try {
+            let data = await this.connection.post('/adv/status/')
+            let ret = data.data
+            return ret
+        } catch (error) {
+            console.log({...error});
+        }
+    }
+
+    sellQuestion=async item=>{
+        try {
+            let data = await this.connection.post('/adv/sell/',{name:item})
+            let ret = data.data
+            return ret
+        } catch (error) {
+            console.log({...error});
+        }
+    }
+
+    sellConfirm=async item=>{
+        try{
+            let data = await this.connection.post('/adv/sell/',{name:item,confirm:'yes'})
+            let ret = data.data
+            return ret
+        } catch(err) {
+            console.log({...err})
+        }
+    }
+
+    dash=async (dir,path)=>{
+        try {
+            let data = await this.connection.post('/adv/dash/',{
+                direction:dir,
+                num_rooms:path.length,
+                next_room_ids:path.toString()
+            })
+            let ret = data.data
+            return ret
+        } catch (err) {
+            console.log({...err});
+        }
+    }
+
+    changeName=async name=>{
+        try {
+            let data = await this.connection.post('/adv/change_name/',{name,confirm:"aye"})
+            let ret = data.data
+            console.log(ret);
+            return ret
+        } catch (err) {
+            console.log({...err});
+        }
+    }
+
+    pray = async e=>{
+        try {
+            let data = await this.connection.post('/adv/pray/')
+            let ret = data.data
+            return ret
+        } catch (err) {
+            console.error({...err});
+        }
+    }
+
+    getProof = async e=>{
+        try {
+            let data = await this.connection.get('/bc/last_proof/')
+            let ret = data.data
+            return ret
+        } catch (err) {
+            console.error({...err});
+        }
+    }
+
+    mine = async e=>{
+        try {
+            let data = await this.connection.post('/bc/mine/',{proof:e})
+            let ret = data.data
+            return ret
+        } catch (err) {
+            console.error({...err});
         }
     }
 }
