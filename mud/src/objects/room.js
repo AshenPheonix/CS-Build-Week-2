@@ -28,6 +28,10 @@ class Room{
     addItem=which=>{
         this.items=which
     }
+
+    removeItem=which=>{
+        this.items.splice(which,1)
+    }
 }
 
 export default Room

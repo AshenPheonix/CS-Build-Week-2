@@ -156,6 +156,31 @@ class Connector{
             console.error({...err});
         }
     }
+
+    getKey=async (last,proof)=>{
+        try {
+            this.connection.defaults.baseURL='http://localhost:5000'
+
+            let data = await this.connection.post('/get_coin',{last,diff:proof})
+            let ret = data.data
+
+            this.connection.defaults.baseURL='https://lambda-treasure-hunt.herokuapp.com/api/'
+
+            return ret
+        } catch (err) {
+            this.connection.defaults.baseURL='https://lambda-treasure-hunt.herokuapp.com/api/'            
+        }
+    }
+
+    examine=async e=>{
+        try {
+            let data = await this.connection.post('/adv/examine',{'name':'Wishing Well'})
+            let ret = data.data
+            return ret
+        } catch (err) {
+            
+        }
+    }
 }
 
 export const Connection=new Connector()

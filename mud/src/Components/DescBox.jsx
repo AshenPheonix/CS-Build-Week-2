@@ -4,14 +4,21 @@ import {GlobalContext} from '../Context/provider'
 
 function VisualAid() {
     const [name,setName]=useState('')
+    const [room,setRoom]=useState(-1)
 
-    const {currentRoom,pickup,changeName,gold} = useContext(GlobalContext)
+    const {currentRoom,pickup,changeName,gold,setTreasureRoom} = useContext(GlobalContext)
     // console.log(currentRoom);
 
     const handleName=e=>{
         if(name.length>0){
             changeName(name)
             setName('')
+        }
+    }
+
+    const handleRoom=e=>{
+        if(room>-1){
+            setTreasureRoom(room)
         }
     }
 
@@ -42,6 +49,12 @@ function VisualAid() {
                 <>
                     <Input type="text" value={name} onChange={e=>setName(e.target.value)}/>
                     <NameButton onClick={handleName}>Change Name</NameButton>
+                </>
+            }
+            {currentRoom.title==="Wishing Well"&&
+                <>
+                    <Input type="number" value={room} onChange={e=>setRoom(e.target.value)}/>
+                    <NameButton onClick={handleRoom}>Set Treasure Room</NameButton>
                 </>
             }
 

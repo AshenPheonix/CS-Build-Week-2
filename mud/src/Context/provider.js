@@ -24,7 +24,13 @@ const defaultValues={
     resetUser:()=>{},
     changeName:()=>{},
     pray:()=>{},
-    getProof:()=>{}
+    getProof:()=>{},
+    treasureRoom:-1,
+    setTreasureRoom:(room)=>{},
+    GPConnected:false,
+    setGPConnected:which=>{},
+    fetchProof:e=>{},
+    sendMine:e=>{}
 }
 
 const GlobalContext=React.createContext(defaultValues)

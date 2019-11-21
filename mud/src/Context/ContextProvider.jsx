@@ -1,7 +1,9 @@
 import React,{useReducer,useState,useEffect} from 'react';
 import {GlobalContext,defaultValues} from './provider'
 import Room from '../objects/room'
-import sha256 from 'sha256'
+const   SHOP_CACHE_ADD='SHOP_CACHE_ADD',
+        SHOP_CACHE_RESET='SHOP_CACHE_RESET',
+        SHOP_CACHE_SET='SHOP_CACHE_SET'
 
 const reducer = (state,action)=>{
     switch(action.type){
@@ -64,6 +66,13 @@ const reducer = (state,action)=>{
                 footwear:state.footwear
             }))
             return{...state,inventory:items}
+        case SHOP_CACHE_ADD:
+            console.log(`adding ${action.payload.id} with ${action.payload.message}`);
+            return {...state,shopCache:{...state.shopCache,[action.payload.id]:action.payload.message}}
+        case SHOP_CACHE_SET:
+            return{...state,shopCache:{...action.payload}}
+        case SHOP_CACHE_RESET:
+            return{...state,shopCache:{}}
         default:
             console.log('not set up yet')
             return{...state}
@@ -72,9 +81,11 @@ const reducer = (state,action)=>{
 }
 
 function GlobalProvider(props){
-    const [state,dispatch]=useReducer(reducer,defaultValues)
-    const [currentRoom,setcurrentRoom]=useState({id:-1,title:'nullroom',description:'null room',exits:{}})
-    const [cooldown,setCooldown]=useState(0)
+    const   [state,dispatch]=useReducer(reducer,defaultValues)
+    const   [currentRoom,setcurrentRoom]=useState({id:-1,title:'nullroom',description:'null room',exits:{}})
+    const   [cooldown,setCooldown]=useState(0)
+    const   [treasureRoom,setTreasureRoom]=useState(-1)
+    const   [GPConnected,setGPConnected]=useState(false)
 
     const init=async ()=>{
         let payload = {}
@@ -96,9 +107,33 @@ function GlobalProvider(props){
                 // player:tempPlayer
                 player:JSON.parse(localStorage.getItem('player'))
             }
-            console.log(data);
             let temp = payload.map
             temp = Object.entries(temp)
+
+            if(localStorage.getItem('treasure')){
+                setTreasureRoom(Number(localStorage.getItem('treasure')))
+                console.log('triggering initial loadout, ',localStorage.getItem('treasure'));
+            }else{
+                console.log(`missing ${localStorage.getItem("treasure")}`);
+            }
+
+            if(localStorage.getItem('shop_cache')!==undefined){
+                try{
+                    dispatch({
+                        type:SHOP_CACHE_SET,
+                        payload:JSON.parse(localStorage.getItem('shop_cache'))
+                    })
+                }catch(err){
+                    console.error('errored loading');
+                    console.error(err);
+                    console.log(localStorage.getItem("shop_cache"));
+                    dispatch({
+                        type:SHOP_CACHE_SET,
+                        payload:{}
+                    })
+                }
+            }
+
             let actualMap={}
             temp.forEach(e => {
                 const roomData=e[1]
@@ -181,28 +216,27 @@ function GlobalProvider(props){
                 ),
                 newMap={...state.map}
                 newMap[data.room_id]=newRoom
-
+                
                 newRoom.knowExit(reversi[direction],room.id)
                 room.knowExit(direction,newRoom.id)
                 newRoom.addItem(data.items)
-
-                localStorage.setItem('currentRoom',JSON.stringify(newRoom))
+                localStorage.setItem('currentRoom',JSON.stringify())
                 setcurrentRoom(newRoom)
                 dispatch({
                     type:'map_update',
                     payload:{map:newMap}
                 })
                 setCooldown(data.cooldown)
-                console.log(data);
+                // console.log(data);
             }else if(data.room_id){
                 let newMap={...state.map}
                 newMap[data.room_id].knowExit(reversi[direction],room.id)
                 room.knowExit(direction,data.room_id)
                 newMap[room.id]=room
                 setCooldown(data.cooldown)
-                console.log(`setting room to ${data.room_id}`,newMap[data.room_id]);
+                // console.log(`setting room to ${data.room_id}`,newMap[data.room_id]);
                 setcurrentRoom(newMap[data.room_id])
-                console.log(data);
+                // console.log(data);
                 newMap[data.room_id].addItem(data.items)
                 dispatch({
                     type:'map_update',
@@ -230,7 +264,7 @@ function GlobalProvider(props){
                     type:'map_update',
                     payload:{map:newMap}
                 })
-                console.log(data);
+                // console.log(data);
             }
         }
     }
@@ -249,6 +283,7 @@ function GlobalProvider(props){
                 type:'add_item',
                 payload:e
             })
+            setTimeout(resetUser, data.cooldown*1000);
         }
     }
 
@@ -264,11 +299,18 @@ function GlobalProvider(props){
 
     const saleQuestion=async e=>{
         try {
+            if(state.shopCache[e]){
+                
+                return [state.shopCache[e]]
+            }
+            console.log(state.shopCache);
             let data = await state.Connection.sellQuestion(e)
             let ret = data.messages
+            dispatch({type:SHOP_CACHE_ADD,payload:{id:e,message:ret[0]}})
             setCooldown(data.cooldown)
             return ret
         } catch (error) {
+            console.error(error);
             return {fail:'error occured'}
         }
     }
@@ -277,6 +319,7 @@ function GlobalProvider(props){
         try {
             let data = await state.Connection.sellConfirm(e)
             let ret = data
+            setCooldown(data.cooldown)
             setTimeout(resetUser,data.cooldown*1000)
         } catch (error) {
             console.log({...error});
@@ -337,26 +380,66 @@ function GlobalProvider(props){
             let data = await state.Connection.getProof()
             const diff = data.difficulty,
                  last = data.proof
-            let attempt=1
-                console.log('mining');
-            while(!testProof(last,attempt,diff)){
-                attempt+=3126
-            }
-            console.log('found proof ',attempt);
-            data = await state.Connection.mine(attempt)
-            setCooldown(data.cooldown*1000)
+            console.log('recieved', data);
+            console.log('mining ', diff);
+            
+            data = await state.Connection.getKey(last,diff)
+            console.log(data.key);
+            data = await state.Connection.mine(data.key)
+            setCooldown(data.cooldown)
             console.log(data);
+            setTreasureRoom(-1)
         } catch (err) {
             console.error({...err});
         }
     }
 
-    const testProof=(last,att,diff)=>{
-        console.log('running');
-        let key = sha256(`${last}${att}`)
-        let regex = RegExp(`^${'0'.repeat(diff)}`)
-        return regex.test(key)
+    const fetchProof=async e=>{
+        try{
+            let data = await state.Connection.getProof()
+            
+            const  diff=data.difficulty,
+                    last=data.proof
+            return {diff,last}
+        }catch(err){
+            console.error(`Errored fetch proof`,{...err});
+        }
     }
+
+    const sendMine=async e=>{
+        try {
+            let data = await state.Connection.mine(e)
+            return data
+        } catch (err) {
+            console.error(`error sending mine`,{...err});
+        }
+    }
+
+    const examine=async e=>{
+        try {
+            let data = await state.Connection.examine()
+            console.log(data);
+            let temp=data.description.match(/\d{8}/g)
+            // console.log(temp);
+            temp=temp.map(i=>parseInt(i,2))
+            // temp = String.fromCharCode(...temp)
+            localStorage.setItem('treasure',JSON.stringify(Array.from(data.description)))
+            return temp
+        } catch (err) {
+            console.error({...err});
+        }
+    }
+
+    useEffect(()=>{
+        if(treasureRoom!=-1)
+            localStorage.setItem('treasure',treasureRoom)
+    },[treasureRoom])
+
+    useEffect(()=>{
+        if(state.shopCache!==undefined){
+            localStorage.setItem('shop_cache',JSON.stringify(state.shopCache))
+        }
+    },[state.shopCache])
 
     return (
         <GlobalContext.Provider
@@ -374,7 +457,14 @@ function GlobalProvider(props){
                 doSell,
                 changeName,
                 pray,
-                getProof
+                getProof,
+                examine,
+                treasureRoom,
+                setTreasureRoom,
+                GPConnected,
+                setGPConnected,
+                fetchProof,
+                sendMine
             }}
         >
             {props.children}

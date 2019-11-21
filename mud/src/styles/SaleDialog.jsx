@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import * as v from './global'
 
 export const ShopDialog=styled.section`
     width:100vw;
@@ -18,12 +19,13 @@ export const ShopFront=styled.section`
     position:absolute;
     width:50vw;
     height:50vh;
-    border:groove 10px #00a45b;
+    border:ridge 15px #52ffb1;
     border-radius:25px;
     left:25%;
     top:25%;
     opacity:1;
-    background-color:#00703e;
+    background-color:#00240f;
+    box-shadow:10px 10px 10px #00ff8e, -10px -10px 10px #00ff8e
     p{
         position:absolute;
         left:10rem;
@@ -35,16 +37,18 @@ export const ShopFront=styled.section`
         top:40%;
         display:flex;
         flex-wrap:wrap;
-        justify-content:space-evenly;
-        align-content:space-around;
+        
         width:75%;
-        height:25%;
         overflow-y:auto;
     }
 `
 
-export const ShopItem=styled.button`
-
+export const ShopItem=styled(v.DefaultButton)`
+    &.selected{
+        border-color:darkcyan;
+        color:darkcyan;
+    }
+    margin:1.5rem;
 `
 
 export const ShopButton=styled.button`
@@ -55,8 +59,4 @@ export const ShopButton=styled.button`
     background:black;
     color:#00a45b;
     border: groove 2px #00a45b;
-`
-
-export const ShopOptionButtons=styled.button`
-
 `

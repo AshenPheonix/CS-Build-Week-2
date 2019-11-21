@@ -14,6 +14,7 @@ import goal from '../images/well.png'
 import pirate from '../images/pirate.png'
 import holy from '../images/shrine.png'
 import transmog from '../images/transmog.png'
+import x from '../images/x.png'
 
 const   IMAGE_SIZE=50,
         USER_WIDTH=20,
@@ -21,7 +22,7 @@ const   IMAGE_SIZE=50,
 
 
 function Map() {
-    const {map,currentRoom} = useContext(GlobalContext)
+    const {map,currentRoom,treasureRoom} = useContext(GlobalContext)
     const   canvas=useRef(null),
             box=useRef(null),
             base=useRef(null),
@@ -36,7 +37,8 @@ function Map() {
             shop=useRef(null),
             rys=useRef(null),
             shrine=useRef(null),
-            science=useRef(null)
+            science=useRef(null),
+            dig=useRef(null)
             
 
     const [ctx,setCtx]=useState(null)
@@ -84,6 +86,8 @@ function Map() {
             ctx.drawImage(shrine.current,drawX,drawY)
         }else if(which.title==='The Transmogriphier'){
             ctx.drawImage(science.current,drawX,drawY)
+        }else if(treasureRoom!==-1 && which.id==treasureRoom){
+            ctx.drawImage(dig.current,drawX,drawY)
         }
     }
 
@@ -191,7 +195,7 @@ function Map() {
             }
             ctx.drawImage(user.current,playerX,playerY)
         }
-    },[map,currentRoom])
+    },[map,currentRoom,treasureRoom])
 
     return (
         <MapBox ref={box}>
@@ -209,6 +213,7 @@ function Map() {
             <img src={pirate} alt="" ref={rys}/>
             <img src={holy} alt="" ref={shrine}/>
             <img src={transmog} alt="" ref={science}/>
+            <img src={x} alt="" ref={dig}/>
         </MapBox>
     )
 }
