@@ -18,7 +18,6 @@ const defaultValues={
     init:()=>{},
     login:()=>{},
     dispatch:()=>{},
-    map:{},
     currentRoom:null,
     pickup:(item)=>{},
     resetUser:()=>{},

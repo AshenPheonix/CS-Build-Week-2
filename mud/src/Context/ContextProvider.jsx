@@ -92,16 +92,16 @@ function GlobalProvider(props){
         if(localStorage.getItem('player') && localStorage.getItem('map')){
             
             // for fixing screwups while dev
-            let data = await state.Connection.init()
-            let newRoom=new Room(
-                data.room_id,
-                data.title,
-                data.description,
-                data.exits,
-                data.coordinates
-            )
-            localStorage.setItem('currentRoom',JSON.stringify(newRoom))
-            // let tempPlayer = await state.Connection.resetUser()
+            // let data = await state.Connection.init()
+            // let newRoom=new Room(
+            //     data.room_id,
+            //     data.title,
+            //     data.description,
+            //     data.exits,
+            //     data.coordinates
+            // )
+            // localStorage.setItem('currentRoom',JSON.stringify(newRoom))
+            let tempPlayer = await state.Connection.resetUser()
             payload = {
                 map:JSON.parse(localStorage.getItem('map')),
                 // player:tempPlayer
@@ -112,7 +112,6 @@ function GlobalProvider(props){
 
             if(localStorage.getItem('treasure')){
                 setTreasureRoom(Number(localStorage.getItem('treasure')))
-                console.log('triggering initial loadout, ',localStorage.getItem('treasure'));
             }else{
                 console.log(`missing ${localStorage.getItem("treasure")}`);
             }
@@ -146,11 +145,11 @@ function GlobalProvider(props){
             });
             payload.map=actualMap
 
-            if(actualMap[data.room_id]===undefined){
-                actualMap[newRoom.id]=newRoom
-            }
+            // if(actualMap[data.room_id]===undefined){
+            //     actualMap[newRoom.id]=newRoom
+            // }
 
-            // console.log(actualMap);
+            console.log(actualMap);
             // console.log(actualMap[data.room_id]);
             // setcurrentRoom(actualMap[data.room_id])
             setcurrentRoom(actualMap[JSON.parse(localStorage.getItem('currentRoom')).id])
@@ -220,7 +219,8 @@ function GlobalProvider(props){
                 newRoom.knowExit(reversi[direction],room.id)
                 room.knowExit(direction,newRoom.id)
                 newRoom.addItem(data.items)
-                localStorage.setItem('currentRoom',JSON.stringify())
+                if(currentRoom!=undefined && currentRoom!=null)
+                    localStorage.setItem('currentRoom',JSON.stringify())
                 setcurrentRoom(newRoom)
                 dispatch({
                     type:'map_update',
@@ -403,15 +403,28 @@ function GlobalProvider(props){
             return {diff,last}
         }catch(err){
             console.error(`Errored fetch proof`,{...err});
+            return{diff:null,last:null}
         }
     }
 
     const sendMine=async e=>{
         try {
             let data = await state.Connection.mine(e)
+            setTreasureRoom(-1)
+            setCooldown(data.cooldown)
             return data
         } catch (err) {
             console.error(`error sending mine`,{...err});
+        }
+    }
+
+    const getNewProof=async (last,diff)=>{
+        try {
+            let data = await state.Connection.getKey(last,diff);
+            return data.key
+        } catch (err) {
+            console.log('error in getNewProof');
+            console.error(err);
         }
     }
 
@@ -436,7 +449,7 @@ function GlobalProvider(props){
     },[treasureRoom])
 
     useEffect(()=>{
-        if(state.shopCache!==undefined){
+        if(state.shopCache!==undefined && state.shopCache!=NaN){
             localStorage.setItem('shop_cache',JSON.stringify(state.shopCache))
         }
     },[state.shopCache])
@@ -464,7 +477,8 @@ function GlobalProvider(props){
                 GPConnected,
                 setGPConnected,
                 fetchProof,
-                sendMine
+                sendMine,
+                getNewProof
             }}
         >
             {props.children}

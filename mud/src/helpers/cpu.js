@@ -38,7 +38,7 @@ export default class CPU {
     }
     load=which=> {
         /* Load a program into memory. */
-        var address, program;
+        let address, program;
         address = 0;
         program = which;
         this.output=''
@@ -101,6 +101,7 @@ export default class CPU {
         /* Run the CPU. */
         let run = true;
         this.pc=0;
+        this.output=''
         while (run) {
             this.IR = this.ram[this.pc];
             if ((this.IR === 1)) {
@@ -128,13 +129,14 @@ export default class CPU {
         reg = this.ram_read(this.pc);
         this.pc += 1;
         val = this.ram_read(this.pc);
+        val%=256
         this.reg[reg] = val;
     }
     PRN=()=>{
         var reg;
         this.pc += 1;
         reg = this.ram[this.pc];
-        console.log(this.reg[reg]);
+        this.output+=this.reg[reg]
     }
     MUL=()=>{
         var reg1, reg2;

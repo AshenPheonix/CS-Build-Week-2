@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import body from '../images/body.png'
+import * as v from './global'
 
 export const CharSheet = styled.section`
     position:relative;
@@ -41,6 +42,6 @@ export const Backpack=styled(StatBlock)`
     bottom:8%;
 `
 
-export const BPButton=styled.button`
+export const BPButton=styled(v.DefaultButton)`
     
 `

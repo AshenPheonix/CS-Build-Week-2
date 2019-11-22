@@ -36,7 +36,7 @@ function SaleDialog({accept,open,closer,setPass}) {
             [forConf,setForConf]=useState(null),
             [blank,setBlank]=useState(false)
     
-    const [state,dispatch]=useReducer(reducer,{selection:0})
+    const [{selection},dispatch]=useReducer(reducer,{selection:0})
 
     const attemptSell=async e=>{
         if(cooldown<1){
@@ -52,11 +52,11 @@ function SaleDialog({accept,open,closer,setPass}) {
         if(cooldown>0 || inventory.length==0){
             return
         }else if(selling && e){
-            let returned = await saleQuestion(inventory[state.selection])
+            let returned = await saleQuestion(inventory[selection])
             console.log('Sell Check ', returned);
             setDialog(returned[0])
             setSelling(false)
-            setForConf(inventory[state.selection])
+            setForConf(inventory[selection])
         }else if(selling){
             closer(false)
         }else if(e){
@@ -67,11 +67,11 @@ function SaleDialog({accept,open,closer,setPass}) {
     }
 
     const confirm=async e=>{
-        console.log(`confirm dump ${forConf}, ${cooldown}`);
         if(cooldown<1){
             setDialog("Thanks for the Artifact")
             doSell(forConf)
             setForConf(null)
+            setSelling(true)
             setTimeout(revert,1500)
         }
     }
@@ -103,19 +103,19 @@ function SaleDialog({accept,open,closer,setPass}) {
     const ctrl=dir=>{
         switch (dir) {
             case 'up':
-                // console.log('up ',state.selection);
+                // console.log('up ',selection);
                 dispatch({type:DEC,payload:5})
                 break;
             case 'down':
-                // console.log('down ',state.selection);
+                // console.log('down ',selection);
                 dispatch({type:INC,payload:5})
                 break;
             case 'left':
-                // console.log('left ',state.selection);
+                // console.log('left ',selection);
                 dispatch({type:DEC,payload:1})
                 break;
             case 'right':
-                // console.log('right ',state.selection);
+                // console.log('right ',selection);
                 dispatch({type:INC,payload:1})
                 break;
             default:
@@ -129,7 +129,7 @@ function SaleDialog({accept,open,closer,setPass}) {
         }else if(accept!==null){
             accept(null)
         }
-    },[open,state.selection,selling,forConf,cooldown])
+    },[open,selection,selling,forConf,cooldown])
 
     return (
         <ShopDialog className={open?'open':''}>
@@ -141,7 +141,7 @@ function SaleDialog({accept,open,closer,setPass}) {
                     <section>
                         {inventory.map((item,index)=>{
                             let classes='none';
-                            if(index==state.selection && GPConnected){
+                            if(index==selection && GPConnected){
                                 classes='selected'
                             }
                             if(index%5===0 && index>0)

@@ -26,7 +26,7 @@ class Connector{
     attemptMine=async proof=>{
         let data = await this.connection.post('/bc/mine/',{proof})
         let ret = await data.data
-        console.log(ret)
+        return ret
     }
     
     init=async e=>{
@@ -56,7 +56,6 @@ class Connector{
         try {
             let data = await this.connection.post('/adv/move',{direction,next_room_id:attached.toString()})
             let ret = data.data
-            console.log(ret);
             return ret
         } catch (error) {
             console.log({...error});
@@ -157,18 +156,20 @@ class Connector{
         }
     }
 
-    getKey=async (last,proof)=>{
+    getKey=async (proof,diff)=>{
         try {
             this.connection.defaults.baseURL='http://localhost:5000'
-
-            let data = await this.connection.post('/get_coin',{last,diff:proof})
+            console.log({last:proof,diff});
+            let data = await this.connection.post('/get_coin',{last:proof,diff})
             let ret = data.data
 
             this.connection.defaults.baseURL='https://lambda-treasure-hunt.herokuapp.com/api/'
 
             return ret
         } catch (err) {
-            this.connection.defaults.baseURL='https://lambda-treasure-hunt.herokuapp.com/api/'            
+            this.connection.defaults.baseURL='https://lambda-treasure-hunt.herokuapp.com/api/'
+            console.error('error in getKey');
+            console.error(err);
         }
     }
 

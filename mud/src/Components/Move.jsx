@@ -54,7 +54,6 @@ function MoveBar() {
     }
 
     const deny=e=>{
-        console.log('deny',acceptable);
         if(acceptable!=null){
             acceptable(false)
         }else if(clickable!=null){

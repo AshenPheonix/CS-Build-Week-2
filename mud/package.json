@@ -31,5 +31,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@testing-library/react": "^9.3.2",
+    "jest-mock-axios": "^3.1.2",
+    "jest-with-context": "^1.1.1",
+    "react-test-renderer": "^16.12.0"
   }
 }

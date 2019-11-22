@@ -18,11 +18,11 @@ function MineDialog({accept,setPass,open,closer}) {
         }
     }
 
-    const [{attempt},dispatch]=useReducer(reducer,{attempt:0})
+    const   [{attempt},dispatch]=useReducer(reducer,{attempt:0})
 
     const   [dialog,setDialog]=useState('X marks the Spot!'),
             [mining,setMining]=useState(false),
-            {fetchProof,sendMine}=useContext(GlobalContext)
+            {fetchProof,sendMine,getNewProof,treasureRoom,currentRoom}=useContext(GlobalContext)
 
 
     //directional pad lockout and reset
@@ -49,9 +49,9 @@ function MineDialog({accept,setPass,open,closer}) {
             return
         }else if(!e){
             closer(false)
-        }else{
+        }else if (treasureRoom==currentRoom.id){
             dispatch({type:RESET})
-            setDialog(`Mining, please hold ${attempt}`)
+            setDialog(`Mining, please hold`)
             setMining(true)
             mine()
         }
@@ -61,34 +61,17 @@ function MineDialog({accept,setPass,open,closer}) {
         console.log('attempting');
         let {diff,last} = await fetchProof()
         console.log('fetch done');
-        let success=false
-        let int = 0
-        while(!success){
-            const   key=sha256(`${last}${int}`),
-                    req='^'+('0'.repeat(diff)),
-                    regex=new RegExp(req)
-            // console.log(key);
-            // console.log(attempt);
-            if(regex.test(key)){
-                success=true;
-            }else{
-                dispatch({type:INC})
-                int++
-                setDialog(`Mining, please hold ${int} BLAHAHHHAHAHAH`)
-            }
-            if(int>100000){
-                success=true
-            }
-        }
-        console.log('Done!');
+        let proof = await getNewProof(last,diff)
+        setDialog(`Found proof ${proof}, sending`)
+        let data = await sendMine(proof)
+        setDialog(data.messages[0])
         setMining(false)
-        // let data = await sendMine(attempt)
         // console.log(data);
     }
     
     useEffect(()=>{
         if(attempt!=0 && mining){
-            setDialog(`Mining, please hold ${attempt}`)
+            setDialog(`Mining, please hold`)
         }
     },[attempt,mining])
 
